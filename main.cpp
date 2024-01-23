@@ -1,104 +1,86 @@
-#include<iostream>
-#include<list>
-#include<unordered_map>
-using namespace std;
+//C++ implementation of above algorithm 
+#include<bits/stdc++.h> 
+using namespace std; 
 
+// Function to find page faults using indexes 
+int pageFaults(int pages[], int n, int capacity) 
+{ 
+	// To represent set of current pages. We use 
+	// an unordered_set so that we quickly check 
+	// if a page is present in set or not 
+	unordered_set<int> s; 
 
-//Node to store to the data
-class Node{
-    public:
-        string key;
-        int value;
-        Node(string key,int val){
-            key=key;
-            value=val;
-        }
-};
+	// To store least recently used indexes 
+	// of pages. 
+	unordered_map<int, int> indexes; 
 
-//LRU cache data structure
-class LRUCache{
-    public:
-        int max_size;
-        list<Node> l;
-        unordered_map<string,list<Node>::iterator> m;
+	// Start from initial page 
+	int page_faults = 0; 
+	for (int i=0; i<n; i++) 
+	{ 
+		// Check if the set can hold more pages 
+		if (s.size() < capacity) 
+		{ 
+			// Insert it into set if not present 
+			// already which represents page fault 
+			if (s.find(pages[i])==s.end()) 
+			{ 
+				s.insert(pages[i]); 
 
-        LRUCache(int max_size){
-            this->max_size= max_size >1? max_size : 1;
-        }
+				// increment page fault 
+				page_faults++; 
+			} 
 
-        // We will implement three operations
+			// Store the recently used index of 
+			// each page 
+			indexes[pages[i]] = i; 
+		} 
 
-        void InsertKeYValue(string key,int value){
+		// If the set is full then need to perform lru 
+		// i.e. remove the least recently used page 
+		// and insert the current page 
+		else
+		{ 
+			// Check if current page is not already 
+			// present in the set 
+			if (s.find(pages[i]) == s.end()) 
+			{ 
+				// Find the least recently used pages 
+				// that is present in the set 
+				int lru = INT_MAX, val; 
+				for (auto it=s.begin(); it!=s.end(); it++) 
+				{ 
+					if (indexes[*it] < lru) 
+					{ 
+						lru = indexes[*it]; 
+						val = *it; 
+					} 
+				} 
 
-            //two cases whther the key value that is to be accssed is present in cache or not
-            //present in cache
-            if(m.count(key)!=0){
+				// Remove the indexes page 
+				s.erase(val); 
 
-                auto it=m[key];//this will give the address of the key
-                it->value=value;//updating the old value to new one
-            }
-            else{
-                //if that key is not present in cache then we need to get it insertedin cache
-                //Check if cahe is full or not
-                //if yes then remove least recently used key
-                if(l.size()==max_size){
-                    Node last=l.back();
-                    m.erase(last.key);
-                    l.pop_back();
+				// insert the current page 
+				s.insert(pages[i]); 
 
-                }
+				// Increment page faults 
+				page_faults++; 
+			} 
 
-                Node n(key,value);
-                l.push_front(n);
-                m[key]=l.begin();
-            }
+			// Update the current page index 
+			indexes[pages[i]] = i; 
+		} 
+	} 
 
-        }
+	return page_faults; 
+} 
 
-        int* getValue(string key){
-            if(m.count(key)!=0){
-                auto it=m[key];
-
-                int value=it->value;
-                l.push_front(*it);
-                l.erase(it);
-                m[key]=l.begin();
-                return &l.begin()->value;
-            }
-
-            return NULL;
-        }
-
-        int MostRecentKey(){
-            return l.front().value;
-        }
-};
-
-
-int main(){
-    LRUCache lru(3);
-    lru.InsertKeYValue("Banana",10);
-    lru.InsertKeYValue("Litchi",20);
-    lru.InsertKeYValue("Mango",30);
-    cout<<lru.MostRecentKey()<<endl;
-    cout<<*(lru.getValue("Banana"))<<endl;
-
-    lru.InsertKeYValue("Banana",40);
-    cout<<lru.MostRecentKey()<<endl;
-
-    lru.InsertKeYValue("Carrot",20);
-
-    if(lru.getValue("Litchi")==NULL){
-        cout<<"Litchi does not exist"<<endl;
-    }
-    if(lru.getValue("Mango")==NULL){
-        cout<<"Mango does not exist"<<endl;
-    }
-    if(lru.getValue("Carrot")==NULL){
-        cout<<"Carrot does not exist"<<endl;
-    }
-    if(lru.getValue("Banana")==NULL){
-        cout<<"Banana does not exist"<<endl;
-    }
-
-}
+// Driver code 
+int main() 
+{ 
+	int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2}; 
+	int n = sizeof(pages)/sizeof(pages[0]); 
+	int capacity = 4; 
+	cout << pageFaults(pages, n, capacity); 
+	return 0; 
+} 
