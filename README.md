@@ -24,7 +24,7 @@ set of pages in memory.
    a) Insert page into the set one by one until 
       the size  of set reaches capacity or all
       page requests are processed.
-   b) Simultaneously maintain the recent occurred
+    b) Simultaneously maintain the recent occurred
       index of each page in a map called indexes.
    c) Increment page fault
  ii) Else 
