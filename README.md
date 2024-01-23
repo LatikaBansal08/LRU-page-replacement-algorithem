@@ -18,6 +18,7 @@ Now for the further page reference string —> 0 Page fault because they are alr
 Let capacity be the number of pages that
 memory can hold.  Let set be the current
 set of pages in memory.
+
 1- Start traversing the pages.
  i) If set holds less pages than capacity.
    a) Insert page into the set one by one until 
